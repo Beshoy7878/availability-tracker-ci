@@ -18,12 +18,19 @@ Opened the browser and verified the app works.
 
 # Step 2 – CI Script (ci.sh)
 -Created a Bash script to simulate a CI pipeline locally.
+
 -The script does the following:
+
 1- Checks if node and npm are installed.
+
 2-Installs dependencies (npm ci or npm install).
+
 3-Runs lint if defined in package.json.
+
 4-Runs tests if defined (skips the default stub).
+
 5-Builds Docker image if Dockerfile exists.
+
 6-Runs services with docker-compose if config exists.
 
 Script is fully commented to explain every line.
@@ -104,10 +111,15 @@ services:
     restart: unless-stopped `
 
 How to Run:
+
 docker compose up -d --build
+
 Opens the app on : 
+
 http://localhost:3000
+
 Runs Redis on port 6379.
+
 Automatically restarts services unless manually stopped.
 
 --------------------------------------------------------
@@ -142,6 +154,60 @@ I validated that each part of the pipeline works correctly:
    - Both containers start successfully (`availability-tracker`, `availability-redis`).
 
 ---
+
+## Step 6 – Database Integration (PostgreSQL)
+
+Extended docker-compose.yml to include PostgreSQL service:
+
+db:
+  image: postgres:15-alpine
+  container_name: availability-db
+  environment:
+    POSTGRES_USER: admin
+    POSTGRES_PASSWORD: admin123
+    POSTGRES_DB: availability
+  ports:
+    - "5432:5432"
+  volumes:
+    - postgres_data:/var/lib/postgresql/data
+
+
+Updated app service with DB environment variables:
+
+DB_HOST=db, DB_PORT=5432, DB_USER=admin, DB_PASSWORD=admin123, DB_NAME=availability
+
+
+Modified server.js to use pg.Pool and add /save endpoint.
+
+Data is stored in availabilities table:
+
+SELECT * FROM availabilities;
+
+-----
+
+## Step 7 – Jenkins Pipeline (CI/CD)
+
+Added a Jenkinsfile for automated pipeline:
+
+Jenkins pipeline now:
+
+-Cleans up old containers.
+
+-Installs dependencies.
+
+-Runs lint & tests (non-blocking).
+
+-Builds Docker image.
+
+-Runs app + Redis + PostgreSQL via docker-compose.
+
+-----
+
+## Notes / Fixes
+
+Fixed DB issue by adding depends_on: [redis, db] in docker-compose and modifying server.js with correct PostgreSQL integration.
+
+Validated end-to-end: app saves data into PostgreSQL (availabilities table
 
 ### How to Run Everything
 To run the full pipeline locally:
