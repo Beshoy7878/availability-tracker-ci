@@ -2,6 +2,9 @@ pipeline {
     agent any
 
     stages {
+        stage('Cleanup') {
+            steps {sh 'docker compose down || true'}
+        }
         stage('Install Dependencies') {
             steps { sh 'npm ci' }
         }
