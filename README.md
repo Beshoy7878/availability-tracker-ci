@@ -44,22 +44,35 @@ EXPOSE 3000
 CMD ["npm", "start"]`
 
  Explanation of Each Line:
+ 
 1-FROM node:18-slim : Use a lightweight and stable Node.js 18 base image.
+
 2-WORKDIR /usr/src/app : Set the working directory inside the container.
+
 3-COPY package.json ./* : Copy only dependency files first for better build caching.
+
 4-RUN npm install --production : Install only production dependencies (smaller and safer image).
+
 5-COPY . . : Copy the rest of the application source code.
+
 6-EXPOSE 3000 : Open port 3000 for the app to be accessed externally.
+
 7-CMD ["npm", "start"] : Default command to run the app when the container starts.
 
 How to Build and Run the Docker Image:
+
  Build the Docker image
+
 docker build -t availability-tracker:1.0 .
+
  Run the container on port 3000
+
 docker run -p 3000:3000 availability-tracker:1.0
 
 After running the container, open your browser at:
+
 http://localhost:3000
+
 to see the application running inside Docker.
 
 ---
